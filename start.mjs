@@ -1,18 +1,21 @@
 "use strict";
 import { spawn } from "child_process";
 import { writeFileSync, mkdirSync, existsSync } from "fs";
-import { homedir } from "os";
 import { join } from "path";
+import { cwd, env } from "process";
 
-const cfgDir = join(homedir(), ".qclaw");
-if (!existsSync(cfgDir)) mkdirSync(cfgDir, { recursive: true });
-if (!existsSync(join(cfgDir, "workspace"))) mkdirSync(join(cfgDir, "workspace"), { recursive: true });
+const cfgDir = cwd();
+const qDir = join(cfgDir, ".qclaw");
+const wsDir = join(qDir, "workspace");
+
+if (!existsSync(qDir)) mkdirSync(qDir, { recursive: true });
+if (!existsSync(wsDir)) mkdirSync(wsDir, { recursive: true });
 
 const config = {
   agents: {
     defaults: {
       model: { primary: "deepseek/deepseek-v4-flash" },
-      workspace: join(cfgDir, "workspace"),
+      workspace: wsDir,
       maxConcurrent: 3, timeoutSeconds: 72000,
       llm: { idleTimeoutSeconds: 0 },
       heartbeat: { isolatedSession: true, lightContext: true },
@@ -32,9 +35,7 @@ const config = {
     }
   },
   gateway: {
-    port: 28789,
-    mode: "local",
-    bind: "lan",
+    port: 28789, mode: "local", bind: "lan",
     auth: { mode: "token", token: "smartcat-cloud-token" }
   },
   channels: {
@@ -51,16 +52,14 @@ const config = {
     allow: ["wechat-access", "deepseek"],
     entries: { "wechat-access": { enabled: true }, "deepseek": { enabled: true } }
   },
-  bindings: [{ agentId: "main", match: { channel: "wechat-access", accountId: "*" } }],
-  meta: { lastTouchedVersion: "2026.4.21", lastTouchedAt: new Date().toISOString() }
+  bindings: [{ agentId: "main", match: { channel: "wechat-access", accountId: "*" } }]
 };
 
-writeFileSync(join(cfgDir, "openclaw.json"), JSON.stringify(config, null, 2));
-console.log("Config generated OK");
+writeFileSync(join(qDir, "openclaw.json"), JSON.stringify(config, null, 2));
+console.log("Config OK");
 
-console.log("Starting OpenClaw Gateway...");
-const child = spawn("npx", ["openclaw", "gateway", "run", "--verbose"], {
+console.log("Starting Gateway...");
+spawn("npx", ["openclaw", "gateway", "run", "--verbose"], {
   cwd: cfgDir, stdio: "inherit",
-  env: { ...process.env, HOME: homedir() }
-});
-child.on("exit", (code) => { process.exit(code); });
+  env: { ...env, HOME: cfgDir, OPENCLAW_CONFIG_DIR: qDir }
+}).on("exit", (code) => { process.exit(code); });
