@@ -32,7 +32,9 @@ const config = {
     }
   },
   gateway: {
-    port: 28789, mode: "cloud", bind: "0.0.0.0",
+    port: 28789,
+    mode: "local",
+    bind: "lan",
     auth: { mode: "token", token: "smartcat-cloud-token" }
   },
   channels: {
@@ -54,10 +56,10 @@ const config = {
 };
 
 writeFileSync(join(cfgDir, "openclaw.json"), JSON.stringify(config, null, 2));
-console.log("✅ 配置已生成");
+console.log("Config generated OK");
 
-console.log("🚀 启动 OpenClaw Gateway（前台模式）...");
-const child = spawn("npx", ["openclaw", "gateway", "run", "--verbose", "--bind", "0.0.0.0"], {
+console.log("Starting OpenClaw Gateway...");
+const child = spawn("npx", ["openclaw", "gateway", "run", "--verbose"], {
   cwd: cfgDir, stdio: "inherit",
   env: { ...process.env, HOME: homedir() }
 });
