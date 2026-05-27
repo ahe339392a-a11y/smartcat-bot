@@ -1,0 +1,12 @@
+{
+  "id": "wechat-access",
+  "version": "1.0.0",
+  "channels": ["wechat-access"],
+  "channelConfigs": {
+    "wechat-access": {
+      "schema": { "type": "object", "properties": {}, "additionalProperties": true },
+      "label": "wechat-access",
+      "description": "WeChat access channel"
+    }
+  }
+}
