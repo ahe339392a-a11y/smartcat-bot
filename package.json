@@ -1,0 +1,12 @@
+{
+  "name": "smartcat-cloud",
+  "version": "1.0.0",
+  "description": "小黑云端版",
+  "main": "start.mjs",
+  "scripts": {
+    "start": "node start.mjs"
+  },
+  "dependencies": {
+    "openclaw": "latest"
+  }
+}
